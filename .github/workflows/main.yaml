@@ -1,0 +1,47 @@
+name: Lint, Test, and Format Workflow
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Run on Node 18
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Clean Yarn Cache
+        run: yarn cache clean
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: yarn-${{ runner.OS }}-18-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.OS }}-18-
+
+      - name: Install Dependencies
+        run: yarn install --immutable
+
+      - name: Lint and Check Formatting
+        run: |
+          yarn lint
+          yarn prettier:check
+
+      - name: Compiles
+        run: yarn tsc
+
+      - name: Run Tests
+        run: yarn test:all
+
+      - name: Build
+        run: yarn build

@@ -31,7 +31,7 @@
     "clean": "backstage-cli package clean",
     "prepack": "backstage-cli package prepack",
     "postpack": "backstage-cli package postpack",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@backstage/backend-common": "^0.19.7",

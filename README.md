@@ -56,7 +56,7 @@ opaClient:
       package: 'rbac_policy'
 ```
 
-This plugin currently works together with the [opa-entity-checker](https://github.com/Parsifal-M/brewed-backstage/blob/main/plugins/opa-entity-checker/README.md) and the [opa-permissions-wrapper](https://github.com/Parsifal-M/backstage-opa-permissions-wrapper) plugin(s). 
+This plugin currently works together with the [opa-entity-checker](https://github.com/Parsifal-M/brewed-backstage/blob/main/plugins/opa-entity-checker/README.md) and the [opa-permissions-wrapper](https://github.com/Parsifal-M/backstage-opa-permissions-wrapper) plugin(s).
 
 # Note!
 

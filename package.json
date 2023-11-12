@@ -31,6 +31,7 @@
     "start": "backstage-cli package start",
     "build": "backstage-cli package build",
     "lint": "backstage-cli package lint",
+    "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
     "test": "backstage-cli package test",
     "clean": "backstage-cli package clean",

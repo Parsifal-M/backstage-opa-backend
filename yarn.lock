@@ -4309,6 +4309,7 @@ __metadata:
     "@backstage/backend-common": ^0.19.7
     "@backstage/cli": ^0.22.13
     "@backstage/config": ^1.1.0
+    "@spotify/prettier-config": ^15.0.0
     "@types/express": "*"
     "@types/supertest": ^2.0.12
     axios: ^1.4.0
@@ -4317,6 +4318,7 @@ __metadata:
     husky: ^8.0.3
     lint-staged: ^15.1.0
     msw: ^1.0.0
+    prettier: 3.0.3
     supertest: ^6.2.4
     winston: ^3.2.1
     yn: ^4.0.0
@@ -5081,6 +5083,15 @@ __metadata:
     "@typescript-eslint/parser": ">=5"
     eslint: ">=8.x"
   checksum: cf29a2c356d40a1e6481b1a87525509127ee7b19cbd40c5f05d57081a3df73735c041117aa0ea3a41c4a6077216c88c98bfaadcd74836e30495f1ffc937321d8
+  languageName: node
+  linkType: hard
+
+"@spotify/prettier-config@npm:^15.0.0":
+  version: 15.0.0
+  resolution: "@spotify/prettier-config@npm:15.0.0"
+  peerDependencies:
+    prettier: 2.x
+  checksum: aa5ec5739427f9acdb9d62ae6c04f04a344898567239f7ee45c75c6205ebdffbc61747ea8de6e83baf0bc3785359967de4b7097a8723c4b4063ff57dc5cb6c44
   languageName: node
   linkType: hard
 
@@ -15519,6 +15530,15 @@ __metadata:
   version: 1.1.2
   resolution: "prelude-ls@npm:1.1.2"
   checksum: c4867c87488e4a0c233e158e4d0d5565b609b105d75e4c05dc760840475f06b731332eb93cc8c9cecb840aa8ec323ca3c9a56ad7820ad2e63f0261dadcb154e4
+  languageName: node
+  linkType: hard
+
+"prettier@npm:3.0.3":
+  version: 3.0.3
+  resolution: "prettier@npm:3.0.3"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: e10b9af02b281f6c617362ebd2571b1d7fc9fb8a3bd17e371754428cda992e5e8d8b7a046e8f7d3e2da1dcd21aa001e2e3c797402ebb6111b5cd19609dd228e0
   languageName: node
   linkType: hard
 

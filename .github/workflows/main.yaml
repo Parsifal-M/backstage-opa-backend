@@ -31,7 +31,7 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install --immutable
-      
+
       - name: Lint and Check Formatting
         run: |
           yarn lint:all
@@ -45,5 +45,3 @@ jobs:
 
       - name: Build
         run: yarn build
-
-

@@ -34,7 +34,7 @@ jobs:
 
       - name: Lint and Check Formatting
         run: |
-          yarn lint:all
+          yarn lint
           yarn prettier:check
 
       - name: Compiles

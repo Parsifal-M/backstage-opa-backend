@@ -32,6 +32,8 @@ http://localhost:8181/v1/policies/rbac_policy
 
 You can test the endpoints by running the following command:
 
+`POST /opa/opa-permissions`
+
 ```bash
 curl -X POST http://localhost:7007/opa/opa-permissions \
 -H "Content-Type: application/json" \
@@ -49,6 +51,65 @@ curl -X POST http://localhost:7007/opa/opa-permissions \
         }
     }
 }'
+```
+
+You can do the same as above for the `POST /opa/opa-entity-checker` endpoint.
+
+```bash
+{
+   "input":{
+      "metadata":{
+         "namespace":"default",
+         "annotations":{
+            "backstage.io/managed-by-location":"file:/home/peterm/Personal/brewed-backstage/examples/entities.yaml",
+            "backstage.io/managed-by-origin-location":"file:/home/peterm/Personal/brewed-backstage/examples/entities.yaml"
+         },
+         "name":"example-website",
+         "uid":"8daaf1d5-e298-455c-b3c9-ba001b80713d",
+         "etag":"5f3d6703c8c025224d6ef27da118c753a3f7fcd9"
+      },
+      "apiVersion":"backstage.io/v1alpha1",
+      "kind":"Component",
+      "spec":{
+         "type":"website",
+         "lifecycle":"experimental",
+         "owner":"guests",
+         "system":"examples",
+         "providesApis":[
+            "example-grpc-api"
+         ]
+      },
+      "relations":[
+         {
+            "type":"ownedBy",
+            "targetRef":"group:default/guests",
+            "target":{
+               "kind":"group",
+               "namespace":"default",
+               "name":"guests"
+            }
+         },
+         {
+            "type":"partOf",
+            "targetRef":"system:default/examples",
+            "target":{
+               "kind":"system",
+               "namespace":"default",
+               "name":"examples"
+            }
+         },
+         {
+            "type":"providesApi",
+            "targetRef":"api:default/example-grpc-api",
+            "target":{
+               "kind":"api",
+               "namespace":"default",
+               "name":"example-grpc-api"
+            }
+         }
+      ]
+   }
+}
 ```
 
 Although, it would be better to use something like [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/) to test the endpoints.

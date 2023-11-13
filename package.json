@@ -29,6 +29,7 @@
   "scripts": {
     "tsc": "tsc",
     "start": "backstage-cli package start",
+    "start-backend": "yarn workspace @parsifal-m/plugin-opa-backend start",
     "build": "backstage-cli package build",
     "lint": "backstage-cli package lint",
     "prettier:check": "prettier --check .",

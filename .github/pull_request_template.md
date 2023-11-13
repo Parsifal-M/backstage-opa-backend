@@ -6,6 +6,7 @@
      commits if your PR already received reviews or comments.
 
      Before submitting a Pull Request, please ensure you've done the following:
+     - ✅ Reviewed the [Contributing Guidelines](CONTRIBUTING.md).
      - 📖 Read the Code of Conduct:
      - 👷‍♀️ Create small PRs. In most cases this will be possible.
      - ✅ Provide tests for your changes.

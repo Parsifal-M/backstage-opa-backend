@@ -16,7 +16,7 @@ describe('createRouter', () => {
   beforeAll(async () => {
     config = new ConfigReader({
       opaClient: {
-        baseUrl: 'http://localhost', // replace with your actual URL or mock URL
+        baseUrl: 'http://localhost',
         policies: {
           entityChecker: {
             package: 'entitymeta_policy',
@@ -63,10 +63,10 @@ describe('createRouter', () => {
         .post('/entity-checker')
         .send({ input: 'entityMetadata' });
 
-      expect(response.status).toEqual(500); // Check the HTTP status code
+      expect(response.status).toEqual(500);
       expect(response.body.message).toContain(
         `An error occurred trying to send entity metadata to OPA`,
-      ); // Check the actual error message received
+      );
     });
   });
 

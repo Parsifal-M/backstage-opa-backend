@@ -62,12 +62,6 @@
     "supertest": "^6.2.4"
   },
   "prettier": "@spotify/prettier-config",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "yarn test"
-    }
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
       "eslint --fix",

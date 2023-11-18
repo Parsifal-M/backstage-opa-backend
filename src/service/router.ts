@@ -42,10 +42,12 @@ export async function createRouter(
     const opaUrl = `${opaBaseUrl}/v1/data/${entityCheckerPackage}`;
 
     if (!opaUrl) {
+      logger.error('OPA URL not set or missing!');
       return next(new Error('OPA URL not set or missing!'));
     }
 
     if (!entityMetadata) {
+      logger.error('Entity metadata is missing!');
       return next(new Error('Entity metadata is missing!'));
     }
 
@@ -55,7 +57,13 @@ export async function createRouter(
       });
       return res.json(opaResponse.data.result);
     } catch (error) {
-      res.status(500);
+      logger.error(
+        'An error occurred trying to send entity metadata to OPA:',
+        error,
+      );
+      res.status(500).json({
+        message: `An error occurred trying to send entity metadata to OPA`,
+      });
       return next(error);
     }
   });
@@ -65,19 +73,19 @@ export async function createRouter(
     const opaUrl = `${opaBaseUrl}/v1/data/${opaRbacPackage}`;
 
     if (!opaUrl) {
-      res.status(400);
+      res.status(400).json({ message: 'OPA URL not set or missing!' });
       logger.error('OPA URL not set or missing!');
       return next(new Error('OPA URL not set or missing!'));
     }
 
     if (!opaRbacPackage) {
-      res.status(400);
+      res.status(400).json({ message: 'OPA RBAC package not set or missing!' });
       logger.error('OPA package not set or missing!');
       return next(new Error('OPA package not set or missing!'));
     }
 
     if (!policyInput) {
-      res.status(400);
+      res.status(400).json({ message: 'The policy input is missing!' });
       logger.error('Policy input is missing!');
       return next(new Error('Policy input is missing!'));
     }
@@ -93,8 +101,13 @@ export async function createRouter(
       );
       return res.json(opaResponse.data.result);
     } catch (error) {
-      res.status(500);
-      logger.error('Error during OPA policy evaluation:', error);
+      res.status(500).json({
+        message: `An error occurred trying to send policy input to OPA`,
+      });
+      logger.error(
+        'An error occurred trying to send policy input to OPA:',
+        error,
+      );
       return next(error);
     }
   });

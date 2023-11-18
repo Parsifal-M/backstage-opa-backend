@@ -61,11 +61,9 @@ export async function createRouter(
         'An error occurred trying to send entity metadata to OPA:',
         error,
       );
-      res
-        .status(500)
-        .json({
-          message: `An error occurred trying to send entity metadata to OPA`,
-        });
+      res.status(500).json({
+        message: `An error occurred trying to send entity metadata to OPA`,
+      });
       return next(error);
     }
   });
@@ -103,11 +101,9 @@ export async function createRouter(
       );
       return res.json(opaResponse.data.result);
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: `An error occurred trying to send policy input to OPA`,
-        });
+      res.status(500).json({
+        message: `An error occurred trying to send policy input to OPA`,
+      });
       logger.error(
         'An error occurred trying to send policy input to OPA:',
         error,

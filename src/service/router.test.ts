@@ -136,12 +136,11 @@ describe('createRouter', () => {
     });
 
     it('returns 500 if an error occurs when sending policy input to OPA', async () => {
-    
       mockedAxios.post.mockRejectedValue(new Error());
       const response = await request(app)
         .post('/opa-permissions')
         .send({ policyInput: 'policydata' });
-    
+
       expect(response.status).toEqual(500);
       expect(response.body.message).toEqual(
         'An error occurred trying to send policy input to OPA',

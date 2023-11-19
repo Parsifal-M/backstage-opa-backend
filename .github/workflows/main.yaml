@@ -1,29 +1,12 @@
-name: Lint, Test, and Format Workflow
-
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  setup:
-    name: Setup
+  build:
+    name: Run on Node 18
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
-
-  lint:
-    name: Lint and Check Formatting
-    needs: setup
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -41,59 +24,11 @@ jobs:
           bun run lint
           bun run prettier:check
 
-  test:
-    name: Run Tests
-    needs: compile
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Run Tests
-        run: bun run test:all
-
-  compile:
-    name: Compile
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
-
       - name: Compiles
         run: bun run tsc
 
-  build:
-    name: Build
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
+      - name: Run Tests
+        run: bun run test:all
 
       - name: Build
         run: bun run build

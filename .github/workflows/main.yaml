@@ -1,86 +1,35 @@
-name: CI/CD Pipeline
+name: Lint, Test and Build
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  pipeline:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js and Yarn
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-
-      - name: Cache Yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.yarn/cache
-          key: yarn-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.OS }}-
+          node-version: '18.x'
 
       - name: Install Dependencies
         run: yarn install --immutable
 
-  lint:
-    needs: pipeline
-    runs-on: ubuntu-latest
+      - name: Lint and Check Formatting
+        run: |
+          yarn lint
+          yarn prettier:check
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      - name: Run Tests
+        run: yarn test:all
 
-      - name: Restore Cached Yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.yarn/cache
-          key: yarn-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.OS }}-
-
-      - name: Lint
-        run: yarn lint
-
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Restore Cached Yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.yarn/cache
-          key: yarn-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.OS }}-
-
-      - name: Test
-        run: yarn test
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Restore Cached Yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.yarn/cache
-          key: yarn-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.OS }}-
+      - name: Compiles
+        run: yarn tsc
 
       - name: Build
         run: yarn build

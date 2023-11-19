@@ -17,46 +17,70 @@ jobs:
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
   lint:
     name: Lint and Check Formatting
+    needs: install
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Restore Cached Dependencies
+        uses: actions/cache@v2
         with:
-          bun-version: latest
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Lint and Check Formatting
         run: |
           bun run lint
           bun run prettier:check
+
   test:
     name: Tests
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Restore Cached Dependencies
+        uses: actions/cache@v2
         with:
-          bun-version: latest
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Run Tests
         run: bun run test:all
+
   build:
     name: Compiles and Builds
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Restore Cached Dependencies
+        uses: actions/cache@v2
         with:
-          bun-version: latest
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Compiles
         run: bun run tsc

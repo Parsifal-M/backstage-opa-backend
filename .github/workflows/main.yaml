@@ -1,4 +1,4 @@
-name: Lint, Test, and Format Workflow
+name: Lint, Test and Build
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Run on Node 18
+
     runs-on: ubuntu-latest
 
     steps:

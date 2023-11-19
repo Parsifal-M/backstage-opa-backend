@@ -5,43 +5,51 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Run on Node 18
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18.x'
-
-      - name: Clean Yarn Cache
-        run: yarn cache clean
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/yarn
-          key: yarn-${{ runner.OS }}-18-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.OS }}-18-
+          bun-version: latest
 
       - name: Install Dependencies
-        run: yarn install --immutable
+        run: bun install --frozen-lockfile
 
+  lint:
+    name: Lint and Check Formatting
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Lint and Check Formatting
         run: |
-          yarn lint
-          yarn prettier:check
+          bun run lint
+          bun run prettier:check
 
-      - name: Compiles
-        run: yarn tsc
-
+  test:
+    name: Run Tests
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
       - name: Run Tests
-        run: yarn test:all
+        run: bun run test:all
 
+  compile:
+    name: Compile
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compiles
+        run: bun run tsc
+
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Build
-        run: yarn build
+        run: bun run build

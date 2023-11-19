@@ -1,4 +1,4 @@
-name: Lint, Test, and Format Workflow
+name: Lint, Test and Build
 
 on:
   pull_request:
@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    name: Run on Node 18
     runs-on: ubuntu-latest
 
     steps:
@@ -18,17 +17,6 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Clean Yarn Cache
-        run: yarn cache clean
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/yarn
-          key: yarn-${{ runner.OS }}-18-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            yarn-${{ runner.OS }}-18-
-
       - name: Install Dependencies
         run: yarn install --immutable
 
@@ -37,11 +25,11 @@ jobs:
           yarn lint
           yarn prettier:check
 
-      - name: Compiles
-        run: yarn tsc
-
       - name: Run Tests
         run: yarn test:all
+
+      - name: Compiles
+        run: yarn tsc
 
       - name: Build
         run: yarn build

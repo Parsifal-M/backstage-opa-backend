@@ -3,10 +3,9 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Run on Node 18
+  lint:
+    name: Lint and Check Formatting
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -16,19 +15,37 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
-
       - name: Lint and Check Formatting
         run: |
           bun run lint
           bun run prettier:check
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Run Tests
+        run: bun run test:all
+  build:
+    name: Compiles and Builds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
 
       - name: Compiles
         run: bun run tsc
-
-      - name: Run Tests
-        run: bun run test:all
 
       - name: Build
         run: bun run build

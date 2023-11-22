@@ -5,8 +5,8 @@ import axios from 'axios';
 import { createRouter } from './router';
 import { ConfigReader } from '@backstage/config';
 
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock('node-fetch');
+const mockedFetch = fetch as jest.Mocked<typeof axios>;
 
 describe('createRouter', () => {
   let app: express.Express;
@@ -44,7 +44,7 @@ describe('createRouter', () => {
   describe('POST /entity-checker', () => {
     it('returns data from OPA', async () => {
       const mockResponse = { data: { result: 'mockResult' } };
-      mockedAxios.post.mockResolvedValue(mockResponse);
+      mockedFetch.post.mockResolvedValue(mockResponse);
 
       config.getOptionalString('opaClient.baseUrl');
 
@@ -57,7 +57,7 @@ describe('createRouter', () => {
     });
 
     it('handles entity metadata route error', async () => {
-      mockedAxios.post.mockRejectedValue(new Error());
+      mockedFetch.post.mockRejectedValue(new Error());
 
       const response = await request(app)
         .post('/entity-checker')
@@ -136,7 +136,7 @@ describe('createRouter', () => {
     });
 
     it('returns 500 if an error occurs when sending policy input to OPA', async () => {
-      mockedAxios.post.mockRejectedValue(new Error());
+      mockedFetch.post.mockRejectedValue(new Error());
       const response = await request(app)
         .post('/opa-permissions')
         .send({ policyInput: 'policydata' });

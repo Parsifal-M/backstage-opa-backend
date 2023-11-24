@@ -34,7 +34,7 @@
     "lint": "backstage-cli package lint",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
-    "test:all": "backstage-cli repo test --coverage",
+    "test:all": "backstage-cli repo test",
     "test": "backstage-cli package test",
     "clean": "backstage-cli package clean",
     "prepack": "backstage-cli package prepack",

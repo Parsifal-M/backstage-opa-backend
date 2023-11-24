@@ -34,7 +34,7 @@ export async function createRouter(
     'opaClient.policies.rbac.package',
   );
 
-  router.get('/opa/health', (_, resp) => {
+  router.get('/health', (_, resp) => {
     resp.json({ status: 'ok' });
   });
 
@@ -61,7 +61,7 @@ export async function createRouter(
         body: JSON.stringify(entityMetadata),
       });
       const opaEntityCheckerResponse = await opaResponse.json();
-      return res.json(opaEntityCheckerResponse.result);
+      return res.json(opaEntityCheckerResponse);
     } catch (error) {
       logger.error(
         'An error occurred trying to send entity metadata to OPA:',

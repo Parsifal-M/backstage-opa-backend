@@ -40,12 +40,13 @@ export async function createRouter(
 
   router.post('/entity-checker', async (req, res, next) => {
     const entityMetadata = req.body.input;
-    const opaUrl = `${opaBaseUrl}/v1/data/${entityCheckerPackage}`;
 
-    if (!opaUrl) {
+    if (!opaBaseUrl) {
       logger.error('OPA URL not set or missing!');
       throw new InputError('OPA URL not set or missing!');
     }
+
+    const opaUrl = `${opaBaseUrl}/v1/data/${entityCheckerPackage}`;
 
     if (!entityMetadata) {
       logger.error('Entity metadata is missing!');

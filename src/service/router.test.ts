@@ -11,33 +11,28 @@ const { Response: FetchResponse } = jest.requireActual('node-fetch');
 
 describe('createRouter', () => {
   let app: express.Express;
-  let config: ConfigReader;
 
-  beforeAll(async () => {
-    config = new ConfigReader({
-      opaClient: {
-        baseUrl: 'http://localhost',
-        policies: {
-          entityChecker: {
-            package: 'entitymeta_policy',
-          },
-          rbac: {
-            package: 'rbac_policy',
-          },
+  const config = new ConfigReader({
+    opaClient: {
+      baseUrl: 'http://localhost',
+      policies: {
+        entityChecker: {
+          package: 'entitymeta_policy',
+        },
+        rbac: {
+          package: 'rbac_policy',
         },
       },
-    });
+    },
+  });
 
+  beforeAll(async () => {
     const router = await createRouter({
       logger: getVoidLogger(),
       config: config,
     });
 
     app = express().use(router);
-    jest.resetAllMocks();
-  });
-
-  beforeEach(() => {
     jest.resetAllMocks();
   });
 
@@ -133,6 +128,36 @@ describe('createRouter', () => {
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(mockedResponse);
+    });
+
+    it('will complain if the OPA url is missing', async () => {
+      const localConfig = new ConfigReader({
+        opaClient: {
+          baseUrl: undefined,
+          policies: {
+            entityChecker: {
+              package: 'entitymeta_policy',
+            },
+            rbac: {
+              package: 'rbac_policy',
+            },
+          },
+        },
+      });
+
+      const router = await createRouter({
+        logger: getVoidLogger(),
+        config: localConfig,
+      });
+
+      const localApp = express().use(router);
+
+      const response = await request(localApp)
+        .post(`/entity-checker`)
+        .send({ input: {} }); // send an empty input
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.message).toBe('OPA URL not set or missing!');
     });
 
     it('returns a 500 if OPA is not available', async () => {

@@ -1,9 +1,10 @@
 import express from 'express';
 import Router from 'express-promise-router';
 import { Logger } from 'winston';
-import axios from 'axios';
+import fetch from 'node-fetch';
 import { errorHandler } from '@backstage/backend-common';
 import { Config } from '@backstage/config';
+import { InputError } from '@backstage/errors';
 
 export type RouterOptions = {
   logger: Logger;
@@ -39,23 +40,37 @@ export async function createRouter(
 
   router.post('/entity-checker', async (req, res, next) => {
     const entityMetadata = req.body.input;
+
+    if (!opaBaseUrl) {
+      logger.error('OPA URL not set or missing!');
+      throw new InputError('OPA URL not set or missing!');
+    }
+
     const opaUrl = `${opaBaseUrl}/v1/data/${entityCheckerPackage}`;
 
-    if (!opaUrl) {
-      logger.error('OPA URL not set or missing!');
-      return next(new Error('OPA URL not set or missing!'));
+    if (!entityCheckerPackage) {
+      res
+        .status(400)
+        .json({ message: 'OPA entity checker package not set or missing!' });
+      logger.error('OPA package not set or missing!');
+      throw new InputError('OPA package not set or missing!');
     }
 
     if (!entityMetadata) {
       logger.error('Entity metadata is missing!');
-      return next(new Error('Entity metadata is missing!'));
+      throw new InputError('Entity metadata is missing!');
     }
 
     try {
-      const opaResponse = await axios.post(opaUrl, {
-        input: entityMetadata,
+      const opaResponse = await fetch(opaUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entityMetadata),
       });
-      return res.json(opaResponse.data.result);
+      const opaEntityCheckerResponse = await opaResponse.json();
+      return res.json(opaEntityCheckerResponse);
     } catch (error) {
       logger.error(
         'An error occurred trying to send entity metadata to OPA:',
@@ -70,36 +85,42 @@ export async function createRouter(
 
   router.post('/opa-permissions', async (req, res, next) => {
     const policyInput = req.body.policyInput;
-    const opaUrl = `${opaBaseUrl}/v1/data/${opaRbacPackage}`;
 
-    if (!opaUrl) {
+    if (!opaBaseUrl) {
       res.status(400).json({ message: 'OPA URL not set or missing!' });
       logger.error('OPA URL not set or missing!');
-      return next(new Error('OPA URL not set or missing!'));
+      throw new InputError('OPA URL not set or missing!');
     }
+
+    const opaUrl = `${opaBaseUrl}/v1/data/${opaRbacPackage}`;
 
     if (!opaRbacPackage) {
       res.status(400).json({ message: 'OPA RBAC package not set or missing!' });
       logger.error('OPA package not set or missing!');
-      return next(new Error('OPA package not set or missing!'));
+      throw new InputError('OPA package not set or missing!');
     }
 
     if (!policyInput) {
       res.status(400).json({ message: 'The policy input is missing!' });
       logger.error('Policy input is missing!');
-      return next(new Error('Policy input is missing!'));
+      throw new InputError('Policy input is missing!');
     }
 
     try {
-      const opaResponse = await axios.post(opaUrl, {
-        input: policyInput,
+      const opaResponse = await fetch(opaUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(policyInput),
       });
       logger.info(
         `Permission request sent to OPA with input: ${JSON.stringify(
           policyInput,
         )}`,
       );
-      return res.json(opaResponse.data.result);
+      const opaPermissionsResponse = await opaResponse.json();
+      return res.json(opaPermissionsResponse.result);
     } catch (error) {
       res.status(500).json({
         message: `An error occurred trying to send policy input to OPA`,

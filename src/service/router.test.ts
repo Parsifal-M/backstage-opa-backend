@@ -101,7 +101,7 @@ describe('createRouter', () => {
       },
     };
 
-    const mockedResponse = {
+    const mockedEntityResponse = {
       allow: true,
       is_system_present: true,
       violation: [
@@ -115,7 +115,7 @@ describe('createRouter', () => {
     it('POSTS and returns a response from OPA as expected', async () => {
       (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(() => {
         return Promise.resolve(
-          new FetchResponse(JSON.stringify(mockedResponse), {
+          new FetchResponse(JSON.stringify(mockedEntityResponse), {
             headers: { 'Content-Type': 'application/json' },
           }),
         );
@@ -127,11 +127,11 @@ describe('createRouter', () => {
         .expect('Content-Type', /json/);
 
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual(mockedResponse);
+      expect(res.body).toEqual(mockedEntityResponse);
     });
 
     it('will complain if the OPA url is missing', async () => {
-      const localConfig = new ConfigReader({
+      const noBaseUrlConfig = new ConfigReader({
         opaClient: {
           baseUrl: undefined,
           policies: {
@@ -147,7 +147,7 @@ describe('createRouter', () => {
 
       const router = await createRouter({
         logger: getVoidLogger(),
-        config: localConfig,
+        config: noBaseUrlConfig,
       });
 
       const localApp = express().use(router);
@@ -160,7 +160,39 @@ describe('createRouter', () => {
       expect(response.body.error.message).toBe('OPA URL not set or missing!');
     });
 
-    it('returns a 500 if OPA is not available', async () => {
+    it('will complain if no entity checker package is set', async () => {
+      const noEntityCheckerPackageConfig = new ConfigReader({
+        opaClient: {
+          baseUrl: 'http://localhost',
+          policies: {
+            entityChecker: {
+              package: undefined,
+            },
+            rbac: {
+              package: 'rbac_policy',
+            },
+          },
+        },
+      });
+
+      const router = await createRouter({
+        logger: getVoidLogger(),
+        config: noEntityCheckerPackageConfig,
+      });
+
+      const localApp = express().use(router);
+
+      const response = await request(localApp)
+        .post(`/entity-checker`)
+        .send({ input: {} });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe(
+        'OPA entity checker package not set or missing!',
+      );
+    });
+
+    it('will return a 500 if OPA there is an issue sending the request to OPA', async () => {
       (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(() => {
         return Promise.reject(new Error('OPA is not available'));
       });
@@ -176,7 +208,7 @@ describe('createRouter', () => {
       });
     });
 
-    it('returns a 400 if the payload is missing', async () => {
+    it('returns a 400 if the input is missing', async () => {
       const res = await request(app)
         .post('/entity-checker')
         .send()
@@ -196,6 +228,132 @@ describe('createRouter', () => {
           statusCode: 400,
         },
       });
+    });
+  });
+
+  describe('Permissions Route', () => {
+    const mockedInput = {
+      input: {
+        permission: {
+          name: 'catalog.entity.read',
+        },
+        identity: {
+          user: 'user:default/parsifal-m',
+          claims: ['user:default/parsifal-m', 'group:default/maintainers'],
+        },
+      },
+    };
+
+    const mockedResponse = {
+      result: {
+        allow: true,
+      },
+    };
+
+    it('POSTS and returns a response from OPA as expected', async () => {
+      (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(() => {
+        return Promise.resolve(
+          new FetchResponse(JSON.stringify(mockedResponse), {
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        );
+      });
+
+      const res = await request(app)
+        .post('/entity-checker')
+        .send(mockedInput)
+        .expect('Content-Type', /json/);
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(mockedResponse);
+    });
+
+    it('will complain if the OPA url is missing', async () => {
+      const noBaseUrlConfig = new ConfigReader({
+        opaClient: {
+          baseUrl: undefined,
+          policies: {
+            entityChecker: {
+              package: 'entitymeta_policy',
+            },
+            rbac: {
+              package: 'rbac_policy',
+            },
+          },
+        },
+      });
+
+      const router = await createRouter({
+        logger: getVoidLogger(),
+        config: noBaseUrlConfig,
+      });
+
+      const localApp = express().use(router);
+
+      const response = await request(localApp)
+        .post(`/opa-permissions`)
+        .send({ input: {} });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('OPA URL not set or missing!');
+    });
+
+    it('will complain if no rbac package is set', async () => {
+      const noRbacPackageConfig = new ConfigReader({
+        opaClient: {
+          baseUrl: 'http://localhost',
+          policies: {
+            entityChecker: {
+              package: 'entitymeta_policy',
+            },
+            rbac: {
+              package: undefined,
+            },
+          },
+        },
+      });
+
+      const router = await createRouter({
+        logger: getVoidLogger(),
+        config: noRbacPackageConfig,
+      });
+
+      const localApp = express().use(router);
+
+      const response = await request(localApp)
+        .post(`/opa-permissions`)
+        .send({ input: {} });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe(
+        'OPA RBAC package not set or missing!',
+      );
+    });
+
+    it('will return 400 if the policy input is missing', async () => {
+      const res = await request(app)
+        .post('/opa-permissions')
+        .send()
+        .expect('Content-Type', /json/);
+
+      expect(res.status).toEqual(400);
+      expect(res.body.message).toEqual('The policy input is missing!');
+    });
+
+    it('will return a 500 if OPA there is an issue sending the request to OPA', async () => {
+      (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(() => {
+        return Promise.reject(new Error('OPA is not available'));
+      });
+
+      const res = await request(app)
+        .post('/opa-permissions')
+        .send({ policyInput: {} })
+        .expect('Content-Type', /json/);
+
+      expect(res.status).toEqual(500);
+      expect(res.body.message).toEqual(
+        'An error occurred trying to send policy input to OPA',
+      );
     });
   });
 });

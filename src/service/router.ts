@@ -48,6 +48,14 @@ export async function createRouter(
 
     const opaUrl = `${opaBaseUrl}/v1/data/${entityCheckerPackage}`;
 
+    if (!entityCheckerPackage) {
+      res
+        .status(400)
+        .json({ message: 'OPA entity checker package not set or missing!' });
+      logger.error('OPA package not set or missing!');
+      throw new InputError('OPA package not set or missing!');
+    }
+
     if (!entityMetadata) {
       logger.error('Entity metadata is missing!');
       throw new InputError('Entity metadata is missing!');
@@ -77,13 +85,14 @@ export async function createRouter(
 
   router.post('/opa-permissions', async (req, res, next) => {
     const policyInput = req.body.policyInput;
-    const opaUrl = `${opaBaseUrl}/v1/data/${opaRbacPackage}`;
 
-    if (!opaUrl) {
+    if (!opaBaseUrl) {
       res.status(400).json({ message: 'OPA URL not set or missing!' });
       logger.error('OPA URL not set or missing!');
       throw new InputError('OPA URL not set or missing!');
     }
+
+    const opaUrl = `${opaBaseUrl}/v1/data/${opaRbacPackage}`;
 
     if (!opaRbacPackage) {
       res.status(400).json({ message: 'OPA RBAC package not set or missing!' });

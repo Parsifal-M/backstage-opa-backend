@@ -67,7 +67,7 @@ export async function createRouter(
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(entityMetadata),
+        body: JSON.stringify({ input: entityMetadata }),
       });
       const opaEntityCheckerResponse = await opaResponse.json();
       return res.json(opaEntityCheckerResponse);
@@ -112,7 +112,7 @@ export async function createRouter(
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(policyInput),
+        body: JSON.stringify({ input: policyInput }),
       });
       logger.info(
         `Permission request sent to OPA with input: ${JSON.stringify(
